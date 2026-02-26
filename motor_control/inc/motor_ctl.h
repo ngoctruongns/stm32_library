@@ -27,9 +27,9 @@ public:
 
     /**
      * @brief Initialize entire motor system
-     * @return HAL_StatusTypeDef Initialization status
+     * @return 0 on success, -1 on error
      */
-    HAL_StatusTypeDef init(void);
+    int32_t init(void);
 
     /**
      * @brief Set desired speed setpoint

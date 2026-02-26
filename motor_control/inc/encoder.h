@@ -1,7 +1,9 @@
 #ifndef ENCODER_H
 #define ENCODER_H
 
-#include "stm32f4xx_hal.h"
+#include "stm32f4xx.h"
+#include "stm32f4xx_ll_tim.h"
+#include <stdint.h>
 
 /**
  * @class Encoder
@@ -15,16 +17,16 @@ class Encoder
 public:
     /**
      * @brief Initialize Encoder
-     * @param htim_encoder Pointer to Timer configuration (TIM2)
+     * @param tim_encoder Pointer to Timer configuration (TIM2)
      * @param ppr Pulses Per Revolution - pulses per revolution
      */
-    Encoder(TIM_HandleTypeDef *htim_encoder, uint16_t ppr = 20);
+    Encoder(TIM_TypeDef *tim_encoder, uint16_t ppr = 20);
 
     /**
      * @brief Initialize encoder timer
-     * @return HAL_StatusTypeDef Initialization status
+     * @return 0 on success, -1 on error
      */
-    HAL_StatusTypeDef init(void);
+    int32_t init(void);
 
     /**
      * @brief Read current counter value from timer
@@ -74,7 +76,7 @@ public:
     float getRPM(void);
 
 private:
-    TIM_HandleTypeDef *_htim_encoder;
+    TIM_TypeDef *_tim_encoder;
     uint16_t _ppr;                    // Pulses Per Revolution
     int32_t _last_count;              // Last counter value
     float _angular_velocity;          // rad/s

@@ -1,7 +1,10 @@
 #ifndef MOTOR_DRIVER_H
 #define MOTOR_DRIVER_H
 
-#include "stm32f4xx_hal.h"
+#include "stm32f4xx.h"
+#include "stm32f4xx_ll_tim.h"
+#include "stm32f4xx_ll_gpio.h"
+#include <stdint.h>
 
 /**
  * @enum MotionDirection
@@ -26,34 +29,32 @@ class MotorDriver
 public:
     /**
      * @brief Initialize Motor Driver for L298 circuit
-     * @param htim Pointer to Timer (TIM3)
-     * @param pwm_channel PWM channel (TIM_CHANNEL_1)
+     * @param tim Pointer to Timer (TIM3)
      * @param gpio_port GPIO Port containing IN1, IN2
      * @param in1_pin IN1 pin (direction control 1)
      * @param in2_pin IN2 pin (direction control 2)
      * @param pwm_max Maximum PWM value (timer auto load value)
      */
-    MotorDriver(TIM_HandleTypeDef *htim, uint32_t pwm_channel,
-                GPIO_TypeDef *gpio_port, uint16_t in1_pin, uint16_t in2_pin,
-                uint32_t pwm_max = 1000);
+    MotorDriver(TIM_TypeDef *tim, GPIO_TypeDef *gpio_port, uint32_t in1_pin,
+                uint32_t in2_pin, uint32_t pwm_max = 1000);
 
     /**
      * @brief Initialize motor driver
-     * @return HAL_StatusTypeDef Initialization status
+     * @return 0 on success, -1 on error
      */
-    HAL_StatusTypeDef init(void);
+    int32_t init(void);
 
     /**
      * @brief Start PWM
-     * @return HAL_StatusTypeDef Status
+     * @return 0 on success, -1 on error
      */
-    HAL_StatusTypeDef startPWM(void);
+    int32_t startPWM(void);
 
     /**
      * @brief Stop PWM
-     * @return HAL_StatusTypeDef Status
+     * @return 0 on success, -1 on error
      */
-    HAL_StatusTypeDef stopPWM(void);
+    int32_t stopPWM(void);
 
     /**
      * @brief Set motion direction
@@ -96,8 +97,7 @@ public:
     void deinit(void);
 
 private:
-    TIM_HandleTypeDef *_htim;
-    uint32_t _pwm_channel;
+    TIM_TypeDef *_tim;
     GPIO_TypeDef *_gpio_port;
     uint16_t _in1_pin;
     uint16_t _in2_pin;

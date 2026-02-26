@@ -1,42 +1,50 @@
 #include "../inc/motor_driver.h"
 #include <stdlib.h>
 
-MotorDriver::MotorDriver(TIM_HandleTypeDef *htim, uint32_t pwm_channel,
-                         GPIO_TypeDef *gpio_port, uint16_t in1_pin,
-                         uint16_t in2_pin, uint32_t pwm_max)
-    : _htim(htim), _pwm_channel(pwm_channel), _gpio_port(gpio_port),
-      _in1_pin(in1_pin), _in2_pin(in2_pin), _pwm_max(pwm_max),
-      _current_speed(0.0f), _direction(MOTOR_STOP)
+MotorDriver::MotorDriver(TIM_TypeDef *tim, GPIO_TypeDef *gpio_port,
+                         uint32_t in1_pin, uint32_t in2_pin, uint32_t pwm_max)
+    : _tim(tim), _gpio_port(gpio_port), _in1_pin(in1_pin), _in2_pin(in2_pin),
+      _pwm_max(pwm_max), _current_speed(0.0f), _direction(MOTOR_STOP)
 {
 }
 
-HAL_StatusTypeDef MotorDriver::init(void)
+int32_t MotorDriver::init(void)
 {
-    if (_htim == nullptr || _gpio_port == nullptr)
-        return HAL_ERROR;
+    if (_tim == nullptr || _gpio_port == nullptr)
+        return -1;
 
-    // Start PWM on channel
-    HAL_StatusTypeDef status = HAL_TIM_PWM_Start(_htim, _pwm_channel);
-    if (status != HAL_OK)
-        return status;
+    // Determine which channel and timer to use
+    // TIM3 Channel 1 is used for PWM
+    // Set compare value to 0 initially
+    LL_TIM_OC_SetCompareCH1(_tim, 0);
 
-    // Reset PWM to 0
-    _updatePWM(0);
+    // Enable timer counter
+    LL_TIM_EnableCounter(_tim);
 
     // Default is stop
     setDirection(MOTOR_STOP);
 
-    return HAL_OK;
+    return 0;
 }
 
-HAL_StatusTypeDef MotorDriver::startPWM(void)
+int32_t MotorDriver::startPWM(void)
 {
-    return HAL_TIM_PWM_Start(_htim, _pwm_channel);
+    if (_tim == nullptr)
+        return -1;
+
+    // Enable PWM output
+    LL_TIM_CC_EnableChannel(_tim, LL_TIM_CHANNEL_CH1);
+    return 0;
 }
 
-HAL_StatusTypeDef MotorDriver::stopPWM(void)
+int32_t MotorDriver::stopPWM(void)
 {
-    return HAL_TIM_PWM_Stop(_htim, _pwm_channel);
+    if (_tim == nullptr)
+        return -1;
+
+    // Disable PWM output
+    LL_TIM_CC_DisableChannel(_tim, LL_TIM_CHANNEL_CH1);
+    return 0;
 }
 
 void MotorDriver::setDirection(MotionDirection direction)
@@ -46,20 +54,20 @@ void MotorDriver::setDirection(MotionDirection direction)
     switch (direction)
     {
     case MOTOR_FORWARD:
-        HAL_GPIO_WritePin(_gpio_port, _in1_pin, GPIO_PIN_SET);
-        HAL_GPIO_WritePin(_gpio_port, _in2_pin, GPIO_PIN_RESET);
+        LL_GPIO_SetOutputPin(_gpio_port, _in1_pin);
+        LL_GPIO_ResetOutputPin(_gpio_port, _in2_pin);
         break;
 
     case MOTOR_BACKWARD:
-        HAL_GPIO_WritePin(_gpio_port, _in1_pin, GPIO_PIN_RESET);
-        HAL_GPIO_WritePin(_gpio_port, _in2_pin, GPIO_PIN_SET);
+        LL_GPIO_ResetOutputPin(_gpio_port, _in1_pin);
+        LL_GPIO_SetOutputPin(_gpio_port, _in2_pin);
         break;
 
     case MOTOR_STOP:
     default:
         // Both pins reset - motor stops
-        HAL_GPIO_WritePin(_gpio_port, _in1_pin, GPIO_PIN_RESET);
-        HAL_GPIO_WritePin(_gpio_port, _in2_pin, GPIO_PIN_RESET);
+        LL_GPIO_ResetOutputPin(_gpio_port, _in1_pin);
+        LL_GPIO_ResetOutputPin(_gpio_port, _in2_pin);
         break;
     }
 }
@@ -116,10 +124,10 @@ void MotorDriver::brake(void)
 void MotorDriver::deinit(void)
 {
     brake();
-    HAL_TIM_PWM_Stop(_htim, _pwm_channel);
+    stopPWM();
 }
 
 void MotorDriver::_updatePWM(uint32_t pulse)
 {
-    __HAL_TIM_SET_COMPARE(_htim, _pwm_channel, pulse);
+    LL_TIM_OC_SetCompareCH1(_tim, pulse);
 }

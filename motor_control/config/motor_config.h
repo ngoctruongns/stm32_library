@@ -10,7 +10,7 @@
 
 // ============= ENCODER CONFIGURATION =============
 /** Number of pulses per revolution of encoder */
-#define ENCODER_PPR 20
+#define ENCODER_PPR 330
 
 // ============= PID CONFIGURATION =============
 /** Proportional coefficient */
@@ -31,13 +31,13 @@
 
 // ============= MOTOR DRIVER CONFIGURATION =============
 /** Maximum PWM value (must match TMAR of Timer 3) */
-#define MOTOR_PWM_MAX 1000
+#define MOTOR_PWM_MAX 6000 // For 10 kHz PWM with 84 MHz timer clock
 
 /** Controller update frequency (Hz) - from main loop */
 #define MOTOR_UPDATE_FREQ 100  // 100 Hz = dt = 0.01s
 
 /** Motor maximum speed (RPM) */
-#define MOTOR_MAX_RPM 1000
+#define MOTOR_MAX_RPM 200   // Motor JBG-520, 330 RPM
 
 // ============= GPIO L298 CONFIGURATION =============
 // These pins must be configured in STM32CubeMX

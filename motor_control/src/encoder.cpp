@@ -3,29 +3,41 @@
 
 #define PI 3.14159265359f
 
-Encoder::Encoder(TIM_HandleTypeDef *htim_encoder, uint16_t ppr)
-    : _htim_encoder(htim_encoder), _ppr(ppr), _last_count(0),
+Encoder::Encoder(TIM_TypeDef *tim_encoder, uint16_t ppr)
+    : _tim_encoder(tim_encoder), _ppr(ppr), _last_count(0),
       _angular_velocity(0.0f), _rpm(0.0f)
 {
 }
 
-HAL_StatusTypeDef Encoder::init(void)
+int32_t Encoder::init(void)
 {
-    if (_htim_encoder == nullptr)
-        return HAL_ERROR;
+    if (_tim_encoder == nullptr)
+        return -1;
 
-    // Start timer in Quadrature Encoder mode
-    return HAL_TIM_Encoder_Start(_htim_encoder, TIM_CHANNEL_ALL);
+    // Initialize TIM2 as encoder timer
+    // Configure as encoder mode with both edges
+    LL_TIM_SetEncoderMode(_tim_encoder, LL_TIM_ENCODERMODE_X4);
+
+    // Set auto-reload value to max (for 16-bit timer)
+    LL_TIM_SetAutoReload(_tim_encoder, 0xFFFF);
+
+    // Reset counter to 0
+    LL_TIM_SetCounter(_tim_encoder, 0);
+
+    // Enable counter
+    LL_TIM_EnableCounter(_tim_encoder);
+
+    return 0;
 }
 
 int32_t Encoder::getRawCount(void)
 {
-    return (int32_t)__HAL_TIM_GET_COUNTER(_htim_encoder);
+    return (int32_t)LL_TIM_GetCounter(_tim_encoder);
 }
 
 void Encoder::resetCount(void)
 {
-    __HAL_TIM_SET_COUNTER(_htim_encoder, 0);
+    LL_TIM_SetCounter(_tim_encoder, 0);
     _last_count = 0;
     _angular_velocity = 0.0f;
     _rpm = 0.0f;

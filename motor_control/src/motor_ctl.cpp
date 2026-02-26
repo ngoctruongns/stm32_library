@@ -7,25 +7,25 @@ Motor::Motor(MotorDriver *driver, Encoder *encoder,
 {
 }
 
-HAL_StatusTypeDef Motor::init(void)
+int32_t Motor::init(void)
 {
     if (_driver == nullptr || _encoder == nullptr || _pid_controller == nullptr)
-        return HAL_ERROR;
+        return -1;
 
     // Initialize driver
-    HAL_StatusTypeDef status = _driver->init();
-    if (status != HAL_OK)
+    int32_t status = _driver->init();
+    if (status != 0)
         return status;
 
     // Initialize encoder
     status = _encoder->init();
-    if (status != HAL_OK)
+    if (status != 0)
         return status;
 
     // Reset PID
     _pid_controller->reset();
 
-    return HAL_OK;
+    return 0;
 }
 
 void Motor::setTargetRPM(float rpm)
