@@ -1,11 +1,9 @@
 #ifndef MOTOR_CTL_H
 #define MOTOR_CTL_H
 
+#include "motor_driver.h"
 #include "encoder.h"
 #include "PID_ctl.h"
-#include "motor_driver.h"
-#include "../config/motor_config.h"
-#include <stdint.h>
 
 /**
  * @class Motor

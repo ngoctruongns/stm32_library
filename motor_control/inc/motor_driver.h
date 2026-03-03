@@ -1,10 +1,7 @@
 #ifndef MOTOR_DRIVER_H
 #define MOTOR_DRIVER_H
 
-#include "stm32f4xx.h"
-#include "stm32f4xx_ll_tim.h"
-#include "stm32f4xx_ll_gpio.h"
-#include <stdint.h>
+#include "motor_config.h"
 
 /**
  * @enum MotionDirection
@@ -29,26 +26,22 @@ class MotorDriver
 public:
     /**
      * @brief Initialize Motor Driver for L298 circuit
-     * @param tim Pointer to Timer (TIM3)
-     * @param gpio_port GPIO Port containing IN1, IN2
+     * @param tim Pointer to Timer output PWM
+     * @param channel Pointer to Timer output PWM channel
+     * @param in1_port IN1 Port
      * @param in1_pin IN1 pin (direction control 1)
+     * @param in2_port IN2 Port
      * @param in2_pin IN2 pin (direction control 2)
-     * @param pwm_max Maximum PWM value (timer auto load value)
+     * @param flip Whether to flip direction (if motor is wired in reverse)
      */
-    MotorDriver(TIM_TypeDef *tim, GPIO_TypeDef *gpio_port, uint32_t in1_pin,
-                uint32_t in2_pin, uint32_t pwm_max = 1000);
+    MotorDriver(TIM_TypeDef *tim, uint32_t channel, GPIO_TypeDef *in1_port, uint32_t in1_pin,
+                GPIO_TypeDef *in2_port, uint32_t in2_pin, bool flip = false);
 
     /**
      * @brief Initialize motor driver
      * @return 0 on success, -1 on error
      */
     int32_t init(void);
-
-    /**
-     * @brief Start PWM
-     * @return 0 on success, -1 on error
-     */
-    int32_t startPWM(void);
 
     /**
      * @brief Stop PWM
@@ -98,12 +91,15 @@ public:
 
 private:
     TIM_TypeDef *_tim;
-    GPIO_TypeDef *_gpio_port;
+    uint32_t _channel;
+    GPIO_TypeDef *_in1_port;
     uint16_t _in1_pin;
+    GPIO_TypeDef *_in2_port;
     uint16_t _in2_pin;
     uint32_t _pwm_max;
     float _current_speed;
     MotionDirection _direction;
+    bool _flip;
 
     /**
      * @brief Helper function to update PWM

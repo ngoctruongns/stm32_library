@@ -1,4 +1,4 @@
-#include "../inc/motor_ctl.h"
+#include "motor_ctl.h"
 
 Motor::Motor(MotorDriver *driver, Encoder *encoder,
              PIDController *pid_controller)
@@ -30,6 +30,13 @@ int32_t Motor::init(void)
 
 void Motor::setTargetRPM(float rpm)
 {
+    // enforce maximum allowed speed
+    if (rpm > MOTOR_MAX_RPM) {
+        rpm = MOTOR_MAX_RPM;
+    } else if (rpm < -MOTOR_MAX_RPM) {
+        rpm = -MOTOR_MAX_RPM;
+    }
+
     _target_rpm = rpm;
 }
 
@@ -37,7 +44,14 @@ void Motor::setTargetAngularVelocity(float rad_per_sec)
 {
     // Convert from rad/s to RPM
     // 1 revolution = 2π rad, so: RPM = rad/s * 60 / 2π
-    _target_rpm = rad_per_sec * 60.0f / 6.28318530718f;
+    float rpm = rad_per_sec * 60.0f / 6.28318530718f;
+    // apply limit
+    if (rpm > MOTOR_MAX_RPM) {
+        rpm = MOTOR_MAX_RPM;
+    } else if (rpm < -MOTOR_MAX_RPM) {
+        rpm = -MOTOR_MAX_RPM;
+    }
+    _target_rpm = rpm;
 }
 
 void Motor::update(float dt)
@@ -51,7 +65,7 @@ void Motor::update(float dt)
     // Compute PID output
     float pid_output = _pid_controller->compute(_target_rpm, current_rpm, dt);
 
-    // Update motor speed
+    // Update motor power based on PID output
     _driver->setSpeed(pid_output);
     _current_power = pid_output;
 }
