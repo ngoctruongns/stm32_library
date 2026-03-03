@@ -1,4 +1,4 @@
-#include "../inc/PID_ctl.h"
+#include "PID_ctl.h"
 
 PIDController::PIDController(float kp, float ki, float kd)
     : _kp(kp), _ki(ki), _kd(kd), _p_term(0.0f), _i_term(0.0f),

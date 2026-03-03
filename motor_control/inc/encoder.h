@@ -1,9 +1,7 @@
 #ifndef ENCODER_H
 #define ENCODER_H
 
-#include "stm32f4xx.h"
-#include "stm32f4xx_ll_tim.h"
-#include <stdint.h>
+#include "motor_config.h"
 
 /**
  * @class Encoder
@@ -17,10 +15,11 @@ class Encoder
 public:
     /**
      * @brief Initialize Encoder
-     * @param tim_encoder Pointer to Timer configuration (TIM2)
+     * @param tim Pointer to Timer configuration
      * @param ppr Pulses Per Revolution - pulses per revolution
+     * @param flip Whether to flip direction (if encoder is mounted in reverse)
      */
-    Encoder(TIM_TypeDef *tim_encoder, uint16_t ppr = 20);
+    Encoder(TIM_TypeDef *tim, uint16_t ppr,  bool flip = false);
 
     /**
      * @brief Initialize encoder timer
@@ -76,11 +75,12 @@ public:
     float getRPM(void);
 
 private:
-    TIM_TypeDef *_tim_encoder;
+    TIM_TypeDef *_tim;
     uint16_t _ppr;                    // Pulses Per Revolution
     int32_t _last_count;              // Last counter value
     float _angular_velocity;          // rad/s
     float _rpm;                       // RPM
+    bool _flip;                       // Flip direction if encoder is mounted in reverse
 };
 
 #endif // ENCODER_H

@@ -1,11 +1,9 @@
 #ifndef MOTOR_CTL_H
 #define MOTOR_CTL_H
 
+#include "motor_driver.h"
 #include "encoder.h"
 #include "PID_ctl.h"
-#include "motor_driver.h"
-#include "../config/motor_config.h"
-#include <stdint.h>
 
 /**
  * @class Motor
@@ -62,12 +60,6 @@ public:
     float getCurrentAngularVelocity(void) const;
 
     /**
-     * @brief Get current output power
-     * @return Output power (0-100%)
-     */
-    float getCurrentPower(void) const;
-
-    /**
      * @brief Get speed error
      * @return Error value (RPM)
      */
@@ -103,12 +95,17 @@ public:
      */
     PIDController *getPIDController(void) { return _pid_controller; }
 
+    /**
+     * @brief Get target RPM setpoint
+     * @return Target RPM
+     */
+    float getTargetRPM(void) const { return _target_rpm; }
+
 private:
     MotorDriver *_driver;
     Encoder *_encoder;
     PIDController *_pid_controller;
     float _target_rpm;
-    float _current_power;
 };
 
 #endif // MOTOR_CTL_H

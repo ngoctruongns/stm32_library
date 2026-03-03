@@ -3,6 +3,7 @@
  * Call PS2X_example_run() from main after clocks and GPIO are initialized.
  */
 
+#include <stdio.h>
 #include "PS2X_lib.h"
 #include "main.h"
 
