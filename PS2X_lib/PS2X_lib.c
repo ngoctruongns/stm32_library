@@ -7,6 +7,11 @@
 // Buffer for PS2 command and response
 static uint8_t ps2_cmd[PS2X_BUFF_SIZE]  = {0x01, 0x42};
 static uint8_t ps2_resp[PS2X_BUFF_SIZE] = {0};
+// static uint8_t enter_config[]={0x01,0x43,0x00,0x01,0x00};
+// static uint8_t set_mode[]={0x01,0x44,0x00,0x01,0x03,0x00,0x00,0x00,0x00};
+// static uint8_t set_bytes_large[]={0x01,0x4F,0x00,0xFF,0xFF,0x03,0x00,0x00,0x00};
+// static uint8_t exit_config[]={0x01,0x43,0x00,0x00,0x5A,0x5A,0x5A,0x5A,0x5A};
+
 PS2X_Data ps2_data;
 
 // Static function prototypes
@@ -74,6 +79,16 @@ int ps2x_init(void)
 
 void ps2x_read_gamepad(void)
 {
+    // Config to analog mode
+    // ps2x_send_command(enter_config, ps2_resp, sizeof(enter_config));
+    // delay_us(10);
+    // ps2x_send_command(set_mode, ps2_resp, sizeof(set_mode));
+    // delay_us(10);
+    // ps2x_send_command(set_bytes_large, ps2_resp, sizeof(set_bytes_large));
+    // delay_us(10);
+    // ps2x_send_command(exit_config, ps2_resp, sizeof(exit_config));
+    // delay_us(10);
+
     // Read PS2 controller state and print button states
     ps2x_send_command(ps2_cmd, ps2_resp, PS2X_BUFF_SIZE);
 

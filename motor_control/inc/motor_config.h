@@ -16,10 +16,10 @@
 
 // ============= PID CONFIGURATION =============
 /** Proportional coefficient */
-#define PID_KP 6.0f
+#define PID_KP 5.0f
 
 /** Integral coefficient */
-#define PID_KI 0.3f
+#define PID_KI 0.1f
 
 /** Derivative coefficient */
 #define PID_KD 0.0f
@@ -34,13 +34,14 @@
 // ============= MOTOR DRIVER CONFIGURATION =============
 /** Maximum PWM value (must match TMAR of Timer 3) */
 #define MOTOR_PWM_FREQ_HZ   1000 // 1 kHz PWM frequency, see config with CubueMX timer settings
-#define MOTOR_PWM_DUTY_MAX  100.0f // Max duty cycle percentage (0-100%)
+#define MOTOR_PWM_DUTY_MAX  70.0f // Max duty cycle percentage (0-100%)
+#define MOTOR_PWM_DUTY_MIN  15.0f // Min duty cycle percentage (0-30%)
 
 /** Controller update frequency (Hz) - from main loop */
 #define MOTOR_UPDATE_FREQ   100  // 100 Hz = dt = 0.01s
 
 /** Motor maximum speed (RPM) */
-#define MOTOR_MAX_RPM       80   // Motor JBG-520, 330 RPM
+#define MOTOR_MAX_RPM       50   // Motor JBG-520, 330 RPM
 
 /** Flip left motor direction (true if motor is wired in reverse) */
 #define MOTOR_LEFT_FLIP       true
@@ -49,7 +50,7 @@
 #define MOTOR_RIGHT_FLIP      false
 
 /*** Dead zone for small motor speeds (percentage) */
-#define MOTOR_DEAD_ZONE       5.0f
+#define MOTOR_DEAD_ZONE       20.0f
 
 // ============= GPIO L298 CONFIGURATION =============
 // Left Motor  -> IN1, IN2

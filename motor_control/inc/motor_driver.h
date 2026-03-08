@@ -97,6 +97,7 @@ private:
     GPIO_TypeDef *_in2_port;
     uint16_t _in2_pin;
     uint32_t _pwm_max;
+    uint32_t _pwm_min;
     float _current_speed;
     MotionDirection _direction;
     bool _flip;

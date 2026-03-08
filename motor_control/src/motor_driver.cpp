@@ -19,6 +19,7 @@ int32_t MotorDriver::init(void)
     // Get timer PWM max value from timer auto reload register
     if (_tim != nullptr) {
         _pwm_max = (LL_TIM_GetAutoReload(_tim) + 1) * MOTOR_PWM_DUTY_MAX / 100.0f;
+        _pwm_min = (LL_TIM_GetAutoReload(_tim) + 1) * MOTOR_PWM_DUTY_MIN / 100.0f;
     }
 
     // Default is stop
@@ -96,10 +97,10 @@ void MotorDriver::setSpeed(float speed)
 
     _current_speed = speed;
 
-    if (speed > 0.0f) {
+    if (speed > 10.0f) {
         setDirection(MOTOR_FORWARD);
         setPower(speed);
-    } else if (speed < 0.0f) {
+    } else if (speed < -10.0f) {
         setDirection(MOTOR_BACKWARD);
         setPower(-speed);
     } else {
@@ -123,5 +124,10 @@ void MotorDriver::deinit(void)
 
 void MotorDriver::_updatePWM(uint32_t pwm)
 {
+    if (pwm < _pwm_min) {
+        pwm = 0; // Below minimum duty cycle, treat as stop
+    } else if (pwm > _pwm_max) {
+        pwm = _pwm_max; // Clamp to max PWM
+    }
     TIMx_setPWM(_tim, _channel, pwm);
 }
