@@ -43,9 +43,8 @@ public:
 
     /**
      * @brief Update PID controller (should be called in main loop)
-     * @param dt Delta time since last call (seconds)
      */
-    void update(float dt);
+    void update(void);
 
     /**
      * @brief Get current speed

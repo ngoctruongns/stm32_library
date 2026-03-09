@@ -63,7 +63,7 @@ The library consists of several coordinated classes that provide high-level moto
   - `init()`: Initialize motor system
   - `setTargetRPM(float rpm)`: Set desired speed in RPM
   - `setTargetAngularVelocity(float rad_per_sec)`: Set desired angular velocity
-  - `update(float dt)`: Update PID control loop
+  - `update()`: Update PID control loop
   - `getCurrentRPM()`: Get current measured speed
 
 ### 5️⃣ **DiffDrive API**
@@ -74,7 +74,7 @@ The library consists of several coordinated classes that provide high-level moto
 - **Key Functions**:
   - `diff_drive_init()`: Initialize differential drive system
   - `diff_drive_set_velocity(float linear, float angular)`: Set robot velocity
-  - `diff_drive_update(float dt)`: Update control loops
+  - `diff_drive_update()`: Update control loops
   - `diff_drive_stop()`: Stop robot
 
 ## 📝 Usage Guide
@@ -99,7 +99,7 @@ motor.setTargetRPM(500.0f);
 
 // Update in main loop (100 Hz)
 while(1) {
-    motor.update(0.01f);  // dt = 10ms
+    motor.update();
     // Add your delay function here (e.g., LL_mDelay(10) or custom delay)
     LL_mDelay(10);
 }
@@ -117,7 +117,7 @@ diff_drive_init();
 diff_drive_set_velocity(0.5f, 0.0f);
 
 // Update control loop
-diff_drive_update(0.01f);  // 100 Hz
+diff_drive_update();  // 100 Hz
 
 // Stop robot
 diff_drive_stop();

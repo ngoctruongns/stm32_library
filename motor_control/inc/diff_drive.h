@@ -40,9 +40,8 @@ void diff_drive_set_velocity(float linear_vel, float angular_vel);
  * This function updates the PID controllers for both motors. It should be called
  * periodically in the main control loop to maintain desired velocities.
  *
- * @param dt Time elapsed since last update in seconds
  */
-void diff_drive_update(float dt);
+void diff_drive_update(void);
 
 /**
  * @brief Stop the differential drive robot

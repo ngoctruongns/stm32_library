@@ -24,8 +24,14 @@
 /** Derivative coefficient */
 #define PID_KD 0.0f
 
-/** Anti-Windup integral limit */
-#define PID_INTEGRAL_LIMIT 50.0f
+/** PID control frequency (Hz) */
+#define PID_CONTROL_FREQ 100
+
+/** Anti-Windup integral limit (50% - 80% PID output) */
+#define PID_INTEGRAL_LIMIT 70.0f
+
+/** Alpha factor for D term low-pass filter EMA (0.1 -0.3) */
+#define PID_ALPHA_EMA 0.3f
 
 /** Output min/max limits */
 #define PID_OUT_MIN -100.0f

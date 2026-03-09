@@ -59,11 +59,8 @@ float Encoder::getAngleRadian(void)
 }
 
 // Update speed with RPM
-void Encoder::updateSpeed(float dt)
+void Encoder::updateSpeed(void)
 {
-    if (dt <= 0.0f)
-        return;
-
     int32_t current_count = getRawCount();
     int32_t delta_count = current_count - _last_count;
     _last_count = current_count;
@@ -72,11 +69,11 @@ void Encoder::updateSpeed(float dt)
     // delta_count / ppr = number of revolutions
     // number of revolutions * 2π = radians
     float delta_revolutions = (float)delta_count / _ppr;
-    _angular_velocity = (delta_revolutions * 2.0f * PI) / dt;
+    _angular_velocity = (delta_revolutions * 2.0f * PI) * PID_CONTROL_FREQ;
 
     // Calculate RPM
     // RPM = (pulses / ppr / dt) * 60
-    _rpm = (delta_revolutions / dt) * 60.0f;
+    _rpm = delta_revolutions * 60.0f * PID_CONTROL_FREQ;
 }
 
 float Encoder::getAngularVelocity(void)

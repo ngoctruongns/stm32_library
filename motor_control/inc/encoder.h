@@ -58,9 +58,8 @@ public:
 
     /**
      * @brief Update encoder speed (should be called periodically)
-     * @param dt Delta time since last call (seconds)
      */
-    void updateSpeed(float dt);
+    void updateSpeed(void);
 
     /**
      * @brief Get current angular velocity

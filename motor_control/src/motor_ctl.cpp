@@ -24,6 +24,8 @@ int32_t Motor::init(void)
 
     // Reset PID
     _pid_controller->reset();
+    _pid_controller->setIntegralLimit(PID_INTEGRAL_LIMIT);
+    _pid_controller->setAlphaEMA(PID_ALPHA_EMA);
 
     return 0;
 }
@@ -49,16 +51,16 @@ void Motor::setTargetAngularVelocity(float rad_per_sec)
     setTargetRPM(rpm);
 }
 
-void Motor::update(float dt)
+void Motor::update(void)
 {
     // Update speed from encoder
-    _encoder->updateSpeed(dt);
+    _encoder->updateSpeed();
 
     // Get current speed
     float current_rpm = _encoder->getRPM();
 
     // Compute PID output
-    float pid_output = _pid_controller->compute(_target_rpm, current_rpm, dt);
+    float pid_output = _pid_controller->compute(_target_rpm, current_rpm);
 
     // Update motor power based on PID output
     _driver->setSpeed(pid_output);

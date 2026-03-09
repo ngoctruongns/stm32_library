@@ -37,6 +37,12 @@ public:
     void setIntegralLimit(float max_integral);
 
     /**
+     * @brief Set alpha factor for D term low-pass filter
+     * @param alpha factor value (0.1 -0.3)
+     */
+    void setAlphaEMA(float alpha);
+
+    /**
      * @brief Set output limits
      * @param out_min Minimum output value
      * @param out_max Maximum output value
@@ -47,10 +53,9 @@ public:
      * @brief Compute and return control value
      * @param setpoint Desired setpoint
      * @param feedback Current feedback value
-     * @param dt Delta time since last call (seconds)
      * @return Control signal (output)
      */
-    float compute(float setpoint, float feedback, float dt);
+    float compute(float setpoint, float feedback);
 
     /**
      * @brief Reset internal states
@@ -75,18 +80,14 @@ public:
      */
     float getD(void) const { return _d_term; }
 
-    /**
-     * @brief Get current error value
-     * @return Error value
-     */
-    float getError(void) const { return _last_error; }
-
 private:
     float _kp, _ki, _kd;              // PID gains
     float _p_term, _i_term, _d_term;  // P, I, D terms
-    float _last_error;                // Error from last call
+    float _last_feedback;             // Feedback from last call
     float _integral_sum;              // Accumulated error sum
     float _max_integral;              // Integral limit
+    float _d_alpha;                   // Low-pass filter factor for D term
+    float _d_filtered_rate;           // Error rate filter for D term
     float _out_min, _out_max;         // Output limits
 };
 

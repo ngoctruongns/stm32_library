@@ -69,11 +69,11 @@ void diff_drive_set_velocity(float linear_vel, float angular_vel)
  * @brief Update differential drive control loop
  * @param dt Delta time since last update (seconds)
  */
-void diff_drive_update(float dt)
+void diff_drive_update(void)
 {
     // Update PID controllers for both motors
-    leftMotor.update(dt);
-    rightMotor.update(dt);
+    leftMotor.update();
+    rightMotor.update();
 }
 
 /**
