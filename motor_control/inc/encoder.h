@@ -28,6 +28,12 @@ public:
     int32_t init(void);
 
     /**
+     * @brief Set encoder RPM low-pass filter alpha
+     * @param alpha Low-pass filter alpha for RPM (0.0f..1.0f)
+     */
+    void setRPMAlpha(float alpha);
+
+    /**
      * @brief Read current counter value from timer
      * @return int32_t Counter value (can be negative if rotating backward)
      */
@@ -80,6 +86,7 @@ private:
     float _angular_velocity;          // rad/s
     float _rpm;                       // RPM
     bool _flip;                       // Flip direction if encoder is mounted in reverse
+    float _rpm_alpha;                 // Low-pass filter alpha for RPM
 };
 
 #endif // ENCODER_H

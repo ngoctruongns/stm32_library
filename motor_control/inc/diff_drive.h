@@ -75,6 +75,14 @@ float getCurrentRPM(MotorNameT motor);
  */
 float getTargetRPM(MotorNameT motor);
 
+/**
+ * @brief Set the target RPM for a specific motor
+ *
+ * @param motor Motor name (MOTOR_L or MOTOR_R)
+ * @param rpm Desired RPM to set
+ */
+void setMotorRPM(MotorNameT motor, float rpm);
+
 #ifdef __cplusplus
 }
 #endif

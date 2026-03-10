@@ -14,21 +14,24 @@
 /** Number of pulses per revolution of encoder */
 #define ENCODER_PPR 330
 
+/** Alpha factor for encoder RPM low-pass filter (0.0f..1.0f, 1.0f = no filter) */
+#define ENCODER_RPM_ALPHA 0.5f
+
 // ============= PID CONFIGURATION =============
 /** Proportional coefficient */
-#define PID_KP 5.0f
+#define PID_KP 3.0f
 
 /** Integral coefficient */
-#define PID_KI 0.1f
+#define PID_KI 0.01f
 
 /** Derivative coefficient */
-#define PID_KD 0.0f
+#define PID_KD 0.05f
 
 /** PID control frequency (Hz) */
-#define PID_CONTROL_FREQ 100
+#define PID_CONTROL_FREQ 50
 
 /** Anti-Windup integral limit (50% - 80% PID output) */
-#define PID_INTEGRAL_LIMIT 70.0f
+#define PID_INTEGRAL_LIMIT 60.0f
 
 /** Alpha factor for D term low-pass filter EMA (0.1 -0.3) */
 #define PID_ALPHA_EMA 0.3f
@@ -40,14 +43,14 @@
 // ============= MOTOR DRIVER CONFIGURATION =============
 /** Maximum PWM value (must match TMAR of Timer 3) */
 #define MOTOR_PWM_FREQ_HZ   1000 // 1 kHz PWM frequency, see config with CubueMX timer settings
-#define MOTOR_PWM_DUTY_MAX  70.0f // Max duty cycle percentage (0-100%)
-#define MOTOR_PWM_DUTY_MIN  15.0f // Min duty cycle percentage (0-30%)
+#define MOTOR_PWM_DUTY_MAX  100.0f // Max duty cycle percentage (0-100%)
+#define MOTOR_PWM_DUTY_MIN  0.0f // Min duty cycle percentage (0-30%)
 
 /** Controller update frequency (Hz) - from main loop */
 #define MOTOR_UPDATE_FREQ   100  // 100 Hz = dt = 0.01s
 
 /** Motor maximum speed (RPM) */
-#define MOTOR_MAX_RPM       50   // Motor JBG-520, 330 RPM
+#define MOTOR_MAX_RPM       200   // Motor JBG-520, 330 RPM
 
 /** Flip left motor direction (true if motor is wired in reverse) */
 #define MOTOR_LEFT_FLIP       true
@@ -56,7 +59,7 @@
 #define MOTOR_RIGHT_FLIP      false
 
 /*** Dead zone for small motor speeds (percentage) */
-#define MOTOR_DEAD_ZONE       20.0f
+#define MOTOR_DEAD_ZONE       10.0f
 
 // ============= GPIO L298 CONFIGURATION =============
 // Left Motor  -> IN1, IN2

@@ -5,7 +5,7 @@
 
 Encoder::Encoder(TIM_TypeDef *tim, uint16_t ppr, bool flip)
     : _tim(tim), _last_count(0),
-      _angular_velocity(0.0f), _rpm(0.0f), _flip(flip)
+      _angular_velocity(0.0f), _rpm(0.0f), _flip(flip), _rpm_alpha(1.0f)
 {
     _ppr = ppr * 4; // Quadrature mode counts 4 times per pulse
 }
@@ -25,6 +25,17 @@ int32_t Encoder::init(void)
     LL_TIM_EnableCounter(CONTROL_LOOP_TIMER);
 
     return 0;
+}
+
+void Encoder::setRPMAlpha(float alpha)
+{
+    if (alpha < 0.0f) {
+        _rpm_alpha = 0.0f;
+    } else if (alpha > 1.0f) {
+        _rpm_alpha = 1.0f;
+    } else {
+        _rpm_alpha = alpha;
+    }
 }
 
 int32_t Encoder::getRawCount(void)
@@ -73,7 +84,11 @@ void Encoder::updateSpeed(void)
 
     // Calculate RPM
     // RPM = (pulses / ppr / dt) * 60
-    _rpm = delta_revolutions * 60.0f * PID_CONTROL_FREQ;
+    float raw_rpm = delta_revolutions * 60.0f * PID_CONTROL_FREQ;
+
+    // Low-pass filter (EMA) on RPM to reduce noise before PID
+    // _rpm_alpha == 1.0f -> no filtering, 0.0f -> keep previous value
+    _rpm = (_rpm_alpha * raw_rpm) + ((1.0f - _rpm_alpha) * _rpm);
 }
 
 float Encoder::getAngularVelocity(void)

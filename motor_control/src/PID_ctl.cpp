@@ -2,8 +2,8 @@
 
 PIDController::PIDController(float kp, float ki, float kd)
     : _kp(kp), _ki(ki), _kd(kd), _p_term(0.0f), _i_term(0.0f),
-      _d_term(0.0f), _d_alpha(0.1f), _d_filtered_rate(0.0f), _integral_sum(0.0f),
-      _max_integral(100.0f), _out_min(-100.0f), _out_max(100.0f)
+      _d_term(0.0f), _integral_sum(0.0f), _max_integral(100.0f),
+      _d_alpha(0.1f), _d_filtered_rate(0.0f), _out_min(-100.0f), _out_max(100.0f)
 {
 }
 
@@ -39,13 +39,14 @@ float PIDController::compute(float setpoint, float feedback)
     /************  I term ************/
     _integral_sum += error;
     _i_term = _ki * _integral_sum;
-    
+
     // I term with Anti-Windup
     if (_i_term > _max_integral) _i_term = _max_integral;
     if (_i_term < -_max_integral) _i_term = -_max_integral;
 
     // Back-calculation
-    _integral_sum = _i_term / _ki; 
+    if (_ki != 0.0f) // Avoid division by zero
+        _integral_sum = _i_term / _ki;
 
     /************  D term ************/
     // Used Feedback to avoid "Derivative Kick" when change Setpoint

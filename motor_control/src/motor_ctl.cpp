@@ -22,6 +22,9 @@ int32_t Motor::init(void)
     if (status != 0)
         return status;
 
+    // Set low-pass filter alpha for encoder RPM
+    _encoder->setRPMAlpha(ENCODER_RPM_ALPHA);
+
     // Reset PID
     _pid_controller->reset();
     _pid_controller->setIntegralLimit(PID_INTEGRAL_LIMIT);

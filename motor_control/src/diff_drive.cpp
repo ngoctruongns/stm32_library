@@ -118,5 +118,14 @@ float getTargetRPM(MotorNameT motor)
     }
 }
 
+void setMotorRPM(MotorNameT motor, float rpm)
+{
+    if (motor == MOTOR_L) {
+        leftMotor.setTargetRPM(rpm);
+    } else if (motor == MOTOR_R) {
+        rightMotor.setTargetRPM(rpm);
+    }
+}
+
 /******************* END FILE *********************/
 } // extern "C"
