@@ -2,7 +2,7 @@
 
 PIDController::PIDController(float kp, float ki, float kd)
     : _kp(kp), _ki(ki), _kd(kd), _p_term(0.0f), _i_term(0.0f),
-      _d_term(0.0f), _integral_sum(0.0f), _max_integral(100.0f),
+      _d_term(0.0f), _last_feedback(0.0f), _integral_sum(0.0f), _max_integral(100.0f),
       _d_alpha(0.1f), _d_filtered_rate(0.0f), _out_min(-100.0f), _out_max(100.0f)
 {
 }
@@ -66,6 +66,14 @@ float PIDController::compute(float setpoint, float feedback)
     if (output < _out_min)
         output = _out_min;
 
+    // Ensure output direction matches setpoint direction
+    if (setpoint > 0.0f && output < 0.0f)
+        output = 0.0f;
+    else if (setpoint < 0.0f && output > 0.0f)
+        output = 0.0f;
+    else if (setpoint == 0.0f)
+        output = 0.0f;
+
     return output;
 }
 
@@ -76,4 +84,5 @@ void PIDController::reset(void)
     _d_term = 0.0f;
     _d_filtered_rate = 0.0f;
     _integral_sum = 0.0f;
+    _last_feedback = 0.0f;
 }

@@ -15,17 +15,17 @@
 #define ENCODER_PPR 330
 
 /** Alpha factor for encoder RPM low-pass filter (0.0f..1.0f, 1.0f = no filter) */
-#define ENCODER_RPM_ALPHA 0.5f
+#define ENCODER_RPM_ALPHA 0.85f
 
 // ============= PID CONFIGURATION =============
 /** Proportional coefficient */
-#define PID_KP 3.0f
+#define PID_KP 3.2f
 
 /** Integral coefficient */
 #define PID_KI 0.01f
 
 /** Derivative coefficient */
-#define PID_KD 0.05f
+#define PID_KD 1.0f
 
 /** PID control frequency (Hz) */
 #define PID_CONTROL_FREQ 50
@@ -44,7 +44,7 @@
 /** Maximum PWM value (must match TMAR of Timer 3) */
 #define MOTOR_PWM_FREQ_HZ   1000 // 1 kHz PWM frequency, see config with CubueMX timer settings
 #define MOTOR_PWM_DUTY_MAX  100.0f // Max duty cycle percentage (0-100%)
-#define MOTOR_PWM_DUTY_MIN  0.0f // Min duty cycle percentage (0-30%)
+#define MOTOR_PWM_DUTY_MIN  0.10f // Min duty cycle percentage (0-30%)
 
 /** Controller update frequency (Hz) - from main loop */
 #define MOTOR_UPDATE_FREQ   100  // 100 Hz = dt = 0.01s
