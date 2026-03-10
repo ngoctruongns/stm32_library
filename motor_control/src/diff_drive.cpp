@@ -66,6 +66,17 @@ void diff_drive_set_velocity(float linear_vel, float angular_vel)
 }
 
 /**
+ * @brief Set PID gains for both left and right motors
+ */
+void diff_drive_set_pid(float kp, float ki, float kd)
+{
+    leftPID.setGains(kp, ki, kd);
+    rightPID.setGains(kp, ki, kd);
+    leftPID.reset();
+    rightPID.reset();
+}
+
+/**
  * @brief Update differential drive control loop
  * @param dt Delta time since last update (seconds)
  */

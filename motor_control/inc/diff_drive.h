@@ -52,6 +52,15 @@ void diff_drive_update(void);
 void diff_drive_stop();
 
 /**
+ * @brief Set global PID gains for differential drive (both left and right motors)
+ *
+ * @param kp proportional gain
+ * @param ki integral gain
+ * @param kd derivative gain
+ */
+void diff_drive_set_pid(float kp, float ki, float kd);
+
+/**
  * @brief Get the raw encoder count for a specific motor
  *
  * @param motor Motor name (MOTOR_L or MOTOR_R)
