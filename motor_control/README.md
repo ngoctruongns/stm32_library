@@ -170,8 +170,14 @@ motor_control/
 │   ├── encoder.cpp         # Encoder implementation
 │   ├── PID_ctl.cpp         # PID implementation
 │   └── diff_drive.cpp      # Diff drive implementation
+├── docs/                  # Optional docs path (suggested)
+│   └── PID_Tuning.png     # PID tuning result chart/reference image
 └── README.md               # This file
 ```
+
+## 📷 PID Tuning Results (Example)
+
+![PID Tuning visualization](docs/PID_Tuning.png)
 
 ## 🔗 Dependencies
 

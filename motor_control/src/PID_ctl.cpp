@@ -1,9 +1,9 @@
 #include "PID_ctl.h"
 
 PIDController::PIDController(float kp, float ki, float kd)
-    : _kp(kp), _ki(ki), _kd(kd), _p_term(0.0f), _i_term(0.0f),
-      _d_term(0.0f), _last_feedback(0.0f), _integral_sum(0.0f), _max_integral(100.0f),
-      _d_alpha(0.1f), _d_filtered_rate(0.0f), _out_min(-100.0f), _out_max(100.0f)
+    : _kp(kp), _ki(ki), _kd(kd), _p_term(0.0f), _i_term(0.0f), _d_term(0.0f), _last_feedback(0.0f),
+      _integral_sum(0.0f), _max_integral(100.0f), _d_alpha(0.1f), _d_filtered_rate(0.0f),
+      _setpoint_filtered(0.0f), _setpoint_slope(5.0f), _out_min(-100.0f), _out_max(100.0f)
 {
 }
 
@@ -30,10 +30,29 @@ void PIDController::setOutputLimit(float out_min, float out_max)
     _out_max = out_max;
 }
 
+void PIDController::setSetpoint(float sp)
+{
+    _setpoint_filtered = sp;
+}
+
+void PIDController::setSetpointSlope(float slope)
+{
+    _setpoint_slope = slope;
+}
+
 float PIDController::compute(float setpoint, float feedback)
 {
+    // Ramp setpoint by filtered value to avoid sudden jumps
+    float setpoint_delta = setpoint - _setpoint_filtered;
+    float clamped_delta = setpoint_delta;
+    if (clamped_delta > _setpoint_slope)
+        clamped_delta = _setpoint_slope;
+    else if (clamped_delta < -_setpoint_slope)
+        clamped_delta = -_setpoint_slope;
+    _setpoint_filtered += clamped_delta;
+
     /************  P term ************/
-    float error = setpoint - feedback;
+    float error = _setpoint_filtered - feedback;
     _p_term = _kp * error;
 
     /************  I term ************/
@@ -85,4 +104,5 @@ void PIDController::reset(void)
     _d_filtered_rate = 0.0f;
     _integral_sum = 0.0f;
     _last_feedback = 0.0f;
+    _setpoint_filtered = 0.0f;
 }

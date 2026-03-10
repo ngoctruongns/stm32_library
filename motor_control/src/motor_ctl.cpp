@@ -29,6 +29,7 @@ int32_t Motor::init(void)
     _pid_controller->reset();
     _pid_controller->setIntegralLimit(PID_INTEGRAL_LIMIT);
     _pid_controller->setAlphaEMA(PID_ALPHA_EMA);
+    _pid_controller->setSetpointSlope(PID_SETPOINT_SLOPE);
 
     return 0;
 }

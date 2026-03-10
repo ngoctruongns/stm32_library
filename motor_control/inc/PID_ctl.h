@@ -50,6 +50,18 @@ public:
     void setOutputLimit(float out_min, float out_max);
 
     /**
+     * @brief Set filtered setpoint for ramp filtering
+     * @param sp Desired setpoint
+     */
+    void setSetpoint(float sp);
+
+    /**
+     * @brief Set maximum ramp step for setpoint filter
+     * @param slope Maximum change of setpoint_filtered per call
+     */
+    void setSetpointSlope(float slope);
+
+    /**
      * @brief Compute and return control value
      * @param setpoint Desired setpoint
      * @param feedback Current feedback value
@@ -88,6 +100,8 @@ private:
     float _max_integral;              // Integral limit
     float _d_alpha;                   // Low-pass filter factor for D term
     float _d_filtered_rate;           // Error rate filter for D term
+    float _setpoint_filtered;         // Filtered setpoint for ramping
+    float _setpoint_slope;            // Max step for filtered setpoint per compute call
     float _out_min, _out_max;         // Output limits
 };
 

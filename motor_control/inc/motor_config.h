@@ -36,6 +36,9 @@
 /** Alpha factor for D term low-pass filter EMA (0.1 -0.3) */
 #define PID_ALPHA_EMA 0.3f
 
+/** Setpoint ramp slope (max change per compute call) */
+#define PID_SETPOINT_SLOPE 5.0f
+
 /** Output min/max limits */
 #define PID_OUT_MIN -100.0f
 #define PID_OUT_MAX 100.0f
