@@ -30,6 +30,7 @@ int32_t Motor::init(void)
     _pid_controller->setIntegralLimit(PID_INTEGRAL_LIMIT);
     _pid_controller->setAlphaEMA(PID_ALPHA_EMA);
     _pid_controller->setSetpointSlope(PID_SETPOINT_SLOPE);
+    _pid_controller->setSetpointDeadzone(MOTOR_MIN_RPM);
 
     return 0;
 }

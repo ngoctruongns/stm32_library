@@ -62,6 +62,12 @@ public:
     void setSetpointSlope(float slope);
 
     /**
+     * @brief Set deadzone for setpoint to avoid oscillation at low speed
+     * @param deadzone Deadzone range around zero (e.g. 5 RPM)
+     */
+    void setSetpointDeadzone(float deadzone);
+
+    /**
      * @brief Compute and return control value
      * @param setpoint Desired setpoint
      * @param feedback Current feedback value
@@ -103,6 +109,7 @@ private:
     float _setpoint_filtered;         // Filtered setpoint for ramping
     float _setpoint_slope;            // Max step for filtered setpoint per compute call
     float _out_min, _out_max;         // Output limits
+    float _sp_deadzone;               // Deadzone for setpoint (RPM)
 };
 
 #endif // PID_CTL_H

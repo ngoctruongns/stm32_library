@@ -46,15 +46,15 @@
 // ============= MOTOR DRIVER CONFIGURATION =============
 /** Maximum PWM value (must match TMAR of Timer 3) */
 #define MOTOR_PWM_FREQ_HZ   1000 // 1 kHz PWM frequency, see config with CubueMX timer settings
-#define MOTOR_PWM_DUTY_MAX  100.0f // Max duty cycle percentage (0-100%)
+#define MOTOR_PWM_DUTY_MAX  90.0f // Max duty cycle percentage (0-100%)
 #define MOTOR_PWM_DUTY_MIN  0.10f // Min duty cycle percentage (0-30%)
 
 /** Controller update frequency (Hz) - from main loop */
-#define MOTOR_UPDATE_FREQ   100  // 100 Hz = dt = 0.01s
+#define MOTOR_UPDATE_FREQ   50  // 50 Hz => dt = 0.02s
 
 /** Motor maximum speed (RPM) */
 #define MOTOR_MAX_RPM       200   // Motor JBG-520, 330 RPM
-
+#define MOTOR_MIN_RPM       5
 /** Flip left motor direction (true if motor is wired in reverse) */
 #define MOTOR_LEFT_FLIP       true
 
