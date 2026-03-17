@@ -17,3 +17,4 @@
 // LED config
 #define WS2812_LED_COUNT        22
 #define BRIGHTNESS_MAX          150 // Brightness max (1-255)
+#define LED_CHANGE_INTERVAL_MS  500 // Minimum interval to change LED color

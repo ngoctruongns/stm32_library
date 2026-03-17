@@ -39,6 +39,8 @@ static volatile uint8_t ws2812_dma_busy = 0;
 led_display_type_t gLedCurrType = LED_TYPE_OFF;
 led_display_config_t gLedCfg;
 
+static ws2812_color_t colorRingBuff[8] = {LED_OFF, LED_RED, LED_GREEN, LED_BLUE, LED_YELLOW, LED_CYAN, LED_MAGENTA, LED_WHITE};
+
 /***  Static function for setting LED display patterns ***/
 /*********************************************************/
 
@@ -346,5 +348,19 @@ void WS2812_loopControl(void)
             break;
         default:
             break;
+    }
+}
+
+void WS2812_ChangeColorRing(void)
+{
+    static uint8_t ring_index = 0;
+    static uint32_t last_change_time = 0;
+    uint32_t current_time = get_ms_tick_count();
+
+    // Check if display minimum time then change to next color
+    if (current_time - last_change_time >= LED_CHANGE_INTERVAL_MS) {
+        WS2812_SetSolidColor(colorRingBuff[ring_index]);
+        ring_index = (ring_index + 1) % 8;
+        last_change_time = current_time;
     }
 }

@@ -77,8 +77,9 @@ typedef union {
 /***  LED interface functions ***/
 // Initialization function to set up GPIO, Timer, and DMA for WS2812 control
 void WS2812_Init(void);
+void WS2812_DMA_IRQHandler(void);
 
-// Loop control for patterns like blinking, breathing, etc. (to be called in main loop)
+// Loop control for patterns
 void WS2812_loopControl(void);
 
 // Interface functions to set different LED display patterns
@@ -86,8 +87,10 @@ void WS2812_SetSolidColor(ws2812_color_t color);
 void WS2812_SetBlink(ws2812_color_t color, uint16_t delay_ms);
 void WS2812_SetRainbow(uint16_t speed_ms);
 void WS2812_SetBreath(ws2812_color_t color, uint16_t breath_period_ms);
-void WS2812_DMA_IRQHandler(void);
 // Add more functions for other patterns as needed
+
+// Change LED color display ring to debug
+void WS2812_ChangeColorRing(void);
 
 #ifdef __cplusplus
 }
