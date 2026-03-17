@@ -34,6 +34,7 @@ static void WS2812_Breath(ws2812_color_t color, uint16_t breath_period_ms);
 /* PWM Buffer: 24 bits per LED + Reset slots (all zeros) */
 static uint16_t pwm_buffer[BUFFER_SIZE];
 static ws2812_color_t led_buffer[WS2812_LED_COUNT];
+static volatile uint8_t ws2812_dma_busy = 0;
 
 led_display_type_t gLedCurrType = LED_TYPE_OFF;
 led_display_config_t gLedCfg;
@@ -100,12 +101,12 @@ static void WS2812_Clear(void)
  */
 static void WS2812_Update(void)
 {
-    // Check for Transfer Error flag
-    if (LL_DMA_IsActiveFlag_TE1(WS2812_DMA)) {
-        LL_DMA_ClearFlag_TE1(WS2812_DMA);
-        LOG_DBG("WS2812 DMA Transfer Error\r\n");
+    if (ws2812_dma_busy)
+    {
         return;
     }
+
+    ws2812_dma_busy = 1;
 
     /* 1. Encode LED buffer to PWM values */
     WS2812_Encode();
@@ -119,20 +120,15 @@ static void WS2812_Update(void)
     LL_DMA_ClearFlag_HT1(WS2812_DMA);
     LL_DMA_ClearFlag_TE1(WS2812_DMA);
 
+    /* 4. Reload DMA length for Normal mode */
+    LL_DMA_SetDataLength(WS2812_DMA, WS2812_DMA_STREAM, BUFFER_SIZE);
+
     /* 5. Enable DMA Stream and Timer DMA Request */
     LL_DMA_EnableStream(WS2812_DMA, WS2812_DMA_STREAM);
 
     /* 6. Start Timer Counter from zero */
     LL_TIM_SetCounter(WS2812_TIM, 0);
     LL_TIM_EnableCounter(WS2812_TIM);
-
-    /* 7. Wait for Transfer Complete (Blocking for debugging) */
-    uint32_t timeout = 1000000;
-    while (!LL_DMA_IsActiveFlag_TC1(WS2812_DMA) && timeout--);
-
-    /* 8. Clean up to prevent continuous PWM output after data is sent */
-    LL_TIM_DisableCounter(WS2812_TIM);
-    LL_DMA_ClearFlag_TC1(WS2812_DMA);
 }
 
 static void WS2812_LedBlink(ws2812_color_t color, uint16_t delay_ms)
@@ -265,6 +261,10 @@ void WS2812_Init(void)
     LL_DMA_SetMemoryAddress(WS2812_DMA, WS2812_DMA_STREAM, (uint32_t)pwm_buffer);
     LL_DMA_SetDataLength(WS2812_DMA, WS2812_DMA_STREAM, BUFFER_SIZE);
 
+    /* Enable DMA interrupts */
+    LL_DMA_EnableIT_TC(WS2812_DMA, WS2812_DMA_STREAM);
+    LL_DMA_EnableIT_TE(WS2812_DMA, WS2812_DMA_STREAM);
+
     LL_TIM_EnableDMAReq_CC1(WS2812_TIM);
 
     /* Enable Preload for Compare Register */
@@ -277,10 +277,26 @@ void WS2812_Init(void)
     LL_TIM_CC_EnableChannel(WS2812_TIM, WS2812_TIM_CHANNEL);
 
     // LL_TIM_OC_SetCompareCH1(WS2812_TIM, 105); // Set duty 50% (ARR=209) for debugging
-    LL_TIM_EnableCounter(WS2812_TIM);
-
+    LL_TIM_DisableCounter(WS2812_TIM);
 }
 
+void WS2812_DMA_IRQHandler(void)
+{
+    if (LL_DMA_IsActiveFlag_TC1(WS2812_DMA))
+    {
+        LL_DMA_ClearFlag_TC1(WS2812_DMA);
+        LL_TIM_DisableCounter(WS2812_TIM);
+        ws2812_dma_busy = 0;
+    }
+
+    if (LL_DMA_IsActiveFlag_TE1(WS2812_DMA))
+    {
+        LL_DMA_ClearFlag_TE1(WS2812_DMA);
+        LL_TIM_DisableCounter(WS2812_TIM);
+        ws2812_dma_busy = 0;
+        LOG_DBG("WS2812 DMA Transfer Error\r\n");
+    }
+}
 
 void WS2812_SetSolidColor(ws2812_color_t color)
 {

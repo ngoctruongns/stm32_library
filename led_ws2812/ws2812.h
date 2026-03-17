@@ -86,6 +86,7 @@ void WS2812_SetSolidColor(ws2812_color_t color);
 void WS2812_SetBlink(ws2812_color_t color, uint16_t delay_ms);
 void WS2812_SetRainbow(uint16_t speed_ms);
 void WS2812_SetBreath(ws2812_color_t color, uint16_t breath_period_ms);
+void WS2812_DMA_IRQHandler(void);
 // Add more functions for other patterns as needed
 
 #ifdef __cplusplus
