@@ -15,6 +15,14 @@
 #define PS2X_BTN_ACTIVE     0
 #define PS2X_BTN_INACTIVE   1
 
+// PS2X status
+typedef enum {
+    PS2X_NO_COMMAND = 0,
+    PS2X_SUCCESS,
+    PS2X_ERROR,
+    PS2X_DISCONNECTED
+} PS2X_Status;
+
 typedef enum {
     PS2X_MODE_DIGITAL = 0x41,
     PS2X_MODE_ANALOG = 0x73,
@@ -65,12 +73,21 @@ typedef struct {
     uint8_t ry; // Right stick Y-axis
     uint8_t lx; // Left stick X-axis
     uint8_t ly; // Left stick Y-axis
-} PS2X_State;   // Total 8 bytes of data
+} PS2X_Packet;   // Total 8 bytes of data
 
 typedef union {
-    PS2X_State state;
+    PS2X_Packet state;
     uint8_t raw[PS2X_BUFF_SIZE -1]; // Exclude first byte which is 0xFF
 } PS2X_Data;
+
+// Define data after encoding from PS2X response
+typedef struct {
+    PS2X_Status status;
+    float linear_vel;
+    float angular_vel;
+    bool buzzer_on;
+    bool led_change;
+} PS2X_CommandData;
 
 // Define Error codes
 #define PS2X_SUCCESS        (0)
@@ -91,10 +108,10 @@ typedef union {
 
 int ps2x_init(void);
 void ps2x_read_gamepad(void);
-PS2X_State ps2x_getAllData(void);
+PS2X_Packet ps2x_getAllData(void);
 uint8_t ps2x_getMode(void);
 bool ps2x_isButtonPressed(void);
 bool ps2x_isJoystickActive(void);
-
+PS2X_CommandData ps2x_update_data(void);
 
 #endif /* PS2X_LIB_H */

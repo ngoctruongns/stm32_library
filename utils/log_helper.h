@@ -2,11 +2,16 @@
 
 #include <stdio.h>
 
-#define LOG_LEVEL_OFF 0
-#define LOG_LEVEL_ERR 1
-#define LOG_LEVEL_WRN 2
-#define LOG_LEVEL_INF 3
-#define LOG_LEVEL_DBG 4
+// Define Enum for log levels
+enum {
+    LOG_LEVEL_OFF = 0,
+    LOG_LEVEL_ERR,  // 1
+    LOG_LEVEL_WRN,  // 2
+    LOG_LEVEL_INF,  // 3
+    LOG_LEVEL_DBG,  // 4
+    LOG_LEVEL_VERB, // 5
+    LOG_LEVEL_MAX   // 6
+};
 
 #define LOG_LEVEL_DEFAULT LOG_LEVEL_INF
 
@@ -25,6 +30,7 @@ void print_buff_hex(int level, void *buff, int length);
 #define LOG_WRN(fmt, args...)   log_printf(LOG_LEVEL_WRN, "W:" fmt "\n", ##args)
 #define LOG_INF(fmt, args...)   log_printf(LOG_LEVEL_INF, "I:" fmt "\n", ##args)
 #define LOG_DBG(fmt, args...)   log_printf(LOG_LEVEL_DBG, "D:" fmt "\n", ##args)
+#define LOG_VERB(fmt, args...)  log_printf(LOG_LEVEL_VERB, "V:" fmt "\n", ##args)
 #define PRINT_DBG(fmt, args...) log_printf(LOG_LEVEL_DBG, fmt, ##args)
 
 // Print buffer data in hex format

@@ -3,6 +3,7 @@
 #include "main.h"
 #include "spi.h"
 #include "log_helper.h"
+#include "diff_drive.h"
 
 // Buffer for PS2 command and response
 static uint8_t ps2_cmd[PS2X_BUFF_SIZE]  = {0x01, 0x42};
@@ -105,7 +106,7 @@ void ps2x_read_gamepad(void)
 }
 
 // Get PS2X data state
-PS2X_State ps2x_getAllData(void)
+PS2X_Packet ps2x_getAllData(void)
 {
     return ps2_data.state;
 }
@@ -132,4 +133,47 @@ bool ps2x_isJoystickActive(void)
 {
     return (ps2_data.raw[PS2X_IDX_RX] != 0x80 || ps2_data.raw[PS2X_IDX_RY] != 0x7F ||
             ps2_data.raw[PS2X_IDX_LX] != 0x80 || ps2_data.raw[PS2X_IDX_LY] != 0x7F);
+}
+
+// Update PS2X data by reading from controller, return 0 if success, negative value if error
+PS2X_CommandData ps2x_update_data(void)
+{
+    PS2X_CommandData cmd_data = {0};
+
+    ps2x_read_gamepad();
+    PS2X_Packet ps2_state = ps2x_getAllData();
+
+    if (ps2_state.btn2.l1 == PS2X_BTN_ACTIVE || ps2_state.btn2.r1 == PS2X_BTN_ACTIVE ||
+        ps2_state.btn2.l2 == PS2X_BTN_ACTIVE || ps2_state.btn2.r2 == PS2X_BTN_ACTIVE) {
+        int16_t ly = 127 - ps2_state.ly;
+        float linear_vel = ((float)ly / 128.0f) * MAX_LINEAR_VEL;
+        if (linear_vel < 0.05f && linear_vel > -0.05f) {
+            linear_vel = 0.0f;
+        }
+
+        int16_t rx = 128 - ps2_state.rx;
+        float angular_vel = ((float)rx / 128.0f) * MAX_ANGULAR_VEL;
+        if (angular_vel < 0.1f && angular_vel > -0.1f) {
+            angular_vel = 0.0f;
+        }
+
+        LOG_DBG("LY:%d,RX:%d\r\n", ly, rx);
+        cmd_data.status = PS2X_SUCCESS;
+        cmd_data.linear_vel = linear_vel;
+        cmd_data.angular_vel = angular_vel;
+    }
+
+    // Triangle button to turn on buzzer
+    if (ps2_state.btn2.triangle == PS2X_BTN_ACTIVE) {
+        cmd_data.status = PS2X_SUCCESS;
+        cmd_data.buzzer_on = true;
+    }
+
+    // Circle button to change LED color
+    if (ps2_state.btn2.circle == PS2X_BTN_ACTIVE) {
+        cmd_data.status = PS2X_SUCCESS;
+        cmd_data.led_change = true;
+    }
+
+    return cmd_data;
 }

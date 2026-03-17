@@ -11,8 +11,8 @@ int get_log_level(void)
 
 void set_log_level(int level)
 {
-    if (level > LOG_LEVEL_DBG) {
-        level = LOG_LEVEL_DBG;
+    if (level >= LOG_LEVEL_MAX) {
+        level = LOG_LEVEL_MAX - 1;
     } else if (level < LOG_LEVEL_OFF) {
         level = LOG_LEVEL_OFF;
     }
