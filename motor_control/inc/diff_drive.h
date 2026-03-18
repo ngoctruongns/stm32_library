@@ -6,7 +6,7 @@ extern "C" {
 
 // Max linear velocity (m/s) - for safety, set to a reasonable value
 #define MAX_LINEAR_VEL      0.6f
-#define MAX_ANGULAR_VEL     3.14f
+#define MAX_ANGULAR_VEL     1.57f
 
 typedef enum
 {

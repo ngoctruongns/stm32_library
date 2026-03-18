@@ -19,13 +19,13 @@
 
 // ============= PID CONFIGURATION =============
 /** Proportional coefficient */
-#define PID_KP 3.2f
+#define PID_KP 4.5f
 
 /** Integral coefficient */
-#define PID_KI 0.01f
+#define PID_KI 0.03f
 
 /** Derivative coefficient */
-#define PID_KD 1.0f
+#define PID_KD 0.05f
 
 /** PID control frequency (Hz) */
 #define PID_CONTROL_FREQ 50

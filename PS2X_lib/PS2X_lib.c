@@ -158,20 +158,20 @@ PS2X_CommandData ps2x_update_data(void)
         }
 
         LOG_DBG("LY:%d,RX:%d\r\n", ly, rx);
-        cmd_data.status = PS2X_SUCCESS;
+        cmd_data.status = PS2X_CMD_SUCCESS;
         cmd_data.linear_vel = linear_vel;
         cmd_data.angular_vel = angular_vel;
     }
 
     // Triangle button to turn on buzzer
     if (ps2_state.btn2.triangle == PS2X_BTN_ACTIVE) {
-        cmd_data.status = PS2X_SUCCESS;
+        cmd_data.status = PS2X_CMD_SUCCESS;
         cmd_data.buzzer_on = true;
     }
 
     // Circle button to change LED color
     if (ps2_state.btn2.circle == PS2X_BTN_ACTIVE) {
-        cmd_data.status = PS2X_SUCCESS;
+        cmd_data.status = PS2X_CMD_SUCCESS;
         cmd_data.led_change = true;
     }
 

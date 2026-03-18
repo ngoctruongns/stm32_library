@@ -17,10 +17,10 @@
 
 // PS2X status
 typedef enum {
-    PS2X_NO_COMMAND = 0,
-    PS2X_SUCCESS,
-    PS2X_ERROR,
-    PS2X_DISCONNECTED
+    PS2X_CMD_NO_COMMAND = 0,
+    PS2X_CMD_SUCCESS,
+    PS2X_CMD_ERROR,
+    PS2X_CMD_DISCONNECTED
 } PS2X_Status;
 
 typedef enum {

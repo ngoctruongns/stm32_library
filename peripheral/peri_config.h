@@ -12,3 +12,6 @@
 
 // Joystick loop interval
 #define JOYSTICK_LOOP_INTERVAL_MS 50U
+
+// Safety timeout: stop motors if no valid control command from joystick/UART3
+#define CONTROL_CMD_TIMEOUT_MS   200U

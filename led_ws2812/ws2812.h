@@ -49,7 +49,8 @@ typedef struct
 typedef struct
 {
     ws2812_color_t color;
-    uint16_t delay_ms;
+    uint16_t on_duration_ms;
+    uint16_t off_duration_ms;
 } led_blink_params_t;
 
 // Params type for breathing effect
@@ -85,6 +86,7 @@ void WS2812_loopControl(void);
 // Interface functions to set different LED display patterns
 void WS2812_SetSolidColor(ws2812_color_t color);
 void WS2812_SetBlink(ws2812_color_t color, uint16_t delay_ms);
+void WS2812_SetBlinkDurations(ws2812_color_t color, uint16_t on_duration_ms, uint16_t off_duration_ms);
 void WS2812_SetRainbow(uint16_t speed_ms);
 void WS2812_SetBreath(ws2812_color_t color, uint16_t breath_period_ms);
 // Add more functions for other patterns as needed

@@ -24,7 +24,7 @@ static void WS2812_SetAll(ws2812_color_t color);
 static void WS2812_Clear(void);
 static void WS2812_Update(void);
 
-static void WS2812_LedBlink(ws2812_color_t color, uint16_t delay_ms);
+static void WS2812_LedBlink(ws2812_color_t color, uint16_t on_duration_ms, uint16_t off_duration_ms);
 static void WS2812_Rainbow(uint16_t speed_ms);
 static void WS2812_Breath(ws2812_color_t color, uint16_t breath_period_ms);
 
@@ -133,13 +133,18 @@ static void WS2812_Update(void)
     LL_TIM_EnableCounter(WS2812_TIM);
 }
 
-static void WS2812_LedBlink(ws2812_color_t color, uint16_t delay_ms)
+static void WS2812_LedBlink(ws2812_color_t color, uint16_t on_duration_ms, uint16_t off_duration_ms)
 {
     static uint32_t last_toggle_time = 0;
     static uint8_t state = 0;
     uint32_t current_time = get_ms_tick_count();
 
-    if ((current_time - last_toggle_time) >= delay_ms)
+    uint16_t active_duration = state ? on_duration_ms : off_duration_ms;
+    if (active_duration == 0U) {
+        active_duration = 1U;
+    }
+
+    if ((current_time - last_toggle_time) >= active_duration)
     {
         state = !state;
         if (state)
@@ -311,9 +316,15 @@ void WS2812_SetSolidColor(ws2812_color_t color)
 
 void WS2812_SetBlink(ws2812_color_t color, uint16_t delay_ms)
 {
+    WS2812_SetBlinkDurations(color, delay_ms, delay_ms);
+}
+
+void WS2812_SetBlinkDurations(ws2812_color_t color, uint16_t on_duration_ms, uint16_t off_duration_ms)
+{
     gLedCurrType = LED_TYPE_BLINK;
     gLedCfg.blink.color = color;
-    gLedCfg.blink.delay_ms = delay_ms;
+    gLedCfg.blink.on_duration_ms = (on_duration_ms > 0U) ? on_duration_ms : 1U;
+    gLedCfg.blink.off_duration_ms = (off_duration_ms > 0U) ? off_duration_ms : 1U;
 }
 
 void WS2812_SetRainbow(uint16_t speed_ms)
@@ -338,7 +349,9 @@ void WS2812_loopControl(void)
             // No loop control needed for solid color
             break;
         case LED_TYPE_BLINK:
-            WS2812_LedBlink(gLedCfg.blink.color, gLedCfg.blink.delay_ms);
+            WS2812_LedBlink(gLedCfg.blink.color,
+                            gLedCfg.blink.on_duration_ms,
+                            gLedCfg.blink.off_duration_ms);
             break;
         case LED_TYPE_RAINBOW:
             WS2812_Rainbow(gLedCfg.rainbow.rainbow_period_ms);
