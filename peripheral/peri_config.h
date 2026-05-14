@@ -15,3 +15,6 @@
 
 // Safety timeout: stop motors if no valid control command from joystick/UART3
 #define CONTROL_CMD_TIMEOUT_MS   200U
+
+// Sensor data logging interval
+#define SENSOR_LOG_INTERVAL_MS   100U

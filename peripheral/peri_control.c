@@ -5,19 +5,21 @@
 #include "PS2X_lib.h"
 #include "buzzer.h"
 #include "diff_drive.h"
+#include "lis302dsh.h"
 #include "log_helper.h"
 #include "uart_lib.h"
+#include "vl53l0x.h"
 #include "ws2812.h"
+
+static LIS302DL_Handle s_lis302dl;
 
 void peripheral_init(void)
 {
-    // Buzzer ON to init
-    Buzzer_Init(BUZZER_TYPE_BEEP, BUZZER_ON);
-
     diff_drive_init();
     WS2812_Init();
 
-    set_log_level(LOG_LEVEL_INF);
+    set_log_level(LOG_LEVEL_DBG);   // TODO: revert to LOG_LEVEL_INF after debugging sensors
+    // set_log_level(LOG_LEVEL_INF);
 
     WS2812_SetSolidColor(LED_RED);
 
@@ -30,6 +32,15 @@ void peripheral_init(void)
         }
     }
 
+    if (LIS302DL_Init(&s_lis302dl, SPI1, LIS302DL_ODR_100HZ, LIS302DL_FS_2G)) {
+        LOG_INF("LIS302DL initialized");
+    } else {
+        LOG_ERR("LIS302DL init failed");
+    }
+
+    // Beep once after all inits complete — avoids buzzer staying ON during long init
+    Buzzer_Init(BUZZER_TYPE_BEEP, BUZZER_ON);
+
     LL_mDelay(100);
     WS2812_SetRainbow(100);
 }
@@ -40,6 +51,7 @@ void peripheral_control_loop(void)
     float angular_vel = 0.0f;
     static uint32_t last_ps2_update_ms = 0;
     static uint32_t last_valid_control_ms = 0;
+    static uint32_t last_vl53_retry_ms = 0U;
 
     WS2812_loopControl();
     Buzzer_Update();
@@ -82,6 +94,22 @@ void peripheral_control_loop(void)
     if ((last_valid_control_ms != 0U) && ((now - last_valid_control_ms) > CONTROL_CMD_TIMEOUT_MS)) {
         diff_drive_stop();
         last_valid_control_ms = 0U;
+    }
+
+    // Periodic sensor data logging
+    static uint32_t last_sensor_log_ms = 0U;
+    if ((now - last_sensor_log_ms) >= SENSOR_LOG_INTERVAL_MS) {
+        last_sensor_log_ms = now;
+
+        if (s_lis302dl.initialized) {
+            LIS302DL_Data accel;
+            if (LIS302DL_ReadMg(&s_lis302dl, &accel)) {
+                LOG_VERB("ACCEL x=%d y=%d z=%d mg",
+                        (int)accel.x_mg,
+                        (int)accel.y_mg,
+                        (int)accel.z_mg);
+            }
+        }
     }
 
 }

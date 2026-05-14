@@ -95,7 +95,7 @@ void ps2x_read_gamepad(void)
 
     // Printf PS2 response for debugging
     if(ps2_resp[2] == 0x5A) {
-        LOG_HEX_DBG(ps2_resp, PS2X_BUFF_SIZE);
+        LOG_HEX_VERB(ps2_resp, PS2X_BUFF_SIZE);
     }
 
     // Fill PS2X_Data struct based on response

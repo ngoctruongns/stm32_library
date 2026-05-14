@@ -36,3 +36,4 @@ void print_buff_hex(int level, void *buff, int length);
 // Print buffer data in hex format
 #define LOG_HEX_INF(buff, length) print_buff_hex(LOG_LEVEL_INF, buff, length)
 #define LOG_HEX_DBG(buff, length) print_buff_hex(LOG_LEVEL_DBG, buff, length)
+#define LOG_HEX_VERB(buff, length) print_buff_hex(LOG_LEVEL_VERB, buff, length)
