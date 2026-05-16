@@ -7,11 +7,12 @@
 #include "diff_drive.h"
 #include "lis302dsh.h"
 #include "log_helper.h"
+#include "mpu6050.h"
 #include "uart_lib.h"
-#include "vl53l0x.h"
 #include "ws2812.h"
 
 static LIS302DL_Handle s_lis302dl;
+static MPU6050_Handle  s_mpu6050;
 
 void peripheral_init(void)
 {
@@ -38,6 +39,13 @@ void peripheral_init(void)
         LOG_ERR("LIS302DL init failed");
     }
 
+    if (MPU6050_Init(&s_mpu6050, I2C3, MPU6050_I2C_ADDR_LOW,
+                     MPU6050_ACCEL_FS_2G, MPU6050_GYRO_FS_250DPS, MPU6050_DLPF_44HZ)) {
+        LOG_INF("MPU6050 initialized");
+    } else {
+        LOG_ERR("MPU6050 init failed");
+    }
+
     // Beep once after all inits complete — avoids buzzer staying ON during long init
     Buzzer_Init(BUZZER_TYPE_BEEP, BUZZER_ON);
 
@@ -51,7 +59,6 @@ void peripheral_control_loop(void)
     float angular_vel = 0.0f;
     static uint32_t last_ps2_update_ms = 0;
     static uint32_t last_valid_control_ms = 0;
-    static uint32_t last_vl53_retry_ms = 0U;
 
     WS2812_loopControl();
     Buzzer_Update();
@@ -96,7 +103,7 @@ void peripheral_control_loop(void)
         last_valid_control_ms = 0U;
     }
 
-    // Periodic sensor data logging
+    // Periodic IMU logging
     static uint32_t last_sensor_log_ms = 0U;
     if ((now - last_sensor_log_ms) >= SENSOR_LOG_INTERVAL_MS) {
         last_sensor_log_ms = now;
@@ -110,8 +117,17 @@ void peripheral_control_loop(void)
                         (int)accel.z_mg);
             }
         }
-    }
 
+        if (s_mpu6050.initialized) {
+            MPU6050_Data imu;
+            if (MPU6050_ReadScaled(&s_mpu6050, &imu)) {
+                LOG_VERB("MPU6050 accel=%d %d %d mg  gyro=%d %d %d dps  temp=%d C",
+                        (int)(imu.ax_g * 1000), (int)(imu.ay_g * 1000), (int)(imu.az_g * 1000),
+                        (int)imu.gx_dps, (int)imu.gy_dps, (int)imu.gz_dps,
+                        (int)imu.temp_c);
+            }
+        }
+    }
 }
 
 void peripheral_tim10_interrupt_handler(void)
