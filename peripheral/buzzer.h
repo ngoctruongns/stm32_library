@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdint.h>
+#include "velocity_control.h"  // shared BUZZER_TYPE_* enum values
 
 // Buzzer states
 typedef enum {
@@ -8,13 +9,7 @@ typedef enum {
     BUZZER_ON
 } BuzzerState;
 
-// Buzzer types
-typedef enum {
-    BUZZER_TYPE_SOLID = 0,
-    BUZZER_TYPE_BLINK,
-    BUZZER_TYPE_BEEP,
-    BUZZER_TYPE_MAX
-} BuzzerType;
+// BuzzerType typedef defined in velocity_control.h
 
 // Struct data for buzzer configuration
 typedef struct {

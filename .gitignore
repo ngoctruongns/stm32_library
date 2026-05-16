@@ -4,3 +4,4 @@ Release/
 *.log
 *.tmp
 .vscode/
+serial_comm/

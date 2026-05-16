@@ -19,8 +19,8 @@ void peripheral_init(void)
     diff_drive_init();
     WS2812_Init();
 
-    set_log_level(LOG_LEVEL_DBG);   // TODO: revert to LOG_LEVEL_INF after debugging sensors
-    // set_log_level(LOG_LEVEL_INF);
+    // set_log_level(LOG_LEVEL_DBG);   // TODO: revert to LOG_LEVEL_INF after debugging sensors
+    set_log_level(LOG_LEVEL_INF);
 
     WS2812_SetSolidColor(LED_RED);
 
@@ -103,9 +103,22 @@ void peripheral_control_loop(void)
         last_valid_control_ms = 0U;
     }
 
-    // Periodic IMU logging
+    // IMU raw read at 50 Hz — feed into odometry packet for EKF
+    static uint32_t last_imu_odom_ms = 0U;
+    if ((now - last_imu_odom_ms) >= IMU_ODOM_INTERVAL_MS) {
+        last_imu_odom_ms = now;
+        if (s_mpu6050.initialized) {
+            MPU6050_RawData imu_raw;
+            if (MPU6050_ReadRaw(&s_mpu6050, &imu_raw)) {
+                uart3_update_imu_raw(imu_raw.ax, imu_raw.ay, imu_raw.az,
+                                     imu_raw.gx, imu_raw.gy, imu_raw.gz);
+            }
+        }
+    }
+
+    // Periodic IMU logging when log level >= DEBUG
     static uint32_t last_sensor_log_ms = 0U;
-    if ((now - last_sensor_log_ms) >= SENSOR_LOG_INTERVAL_MS) {
+    if (get_log_level() >= LOG_LEVEL_DBG && (now - last_sensor_log_ms) >= SENSOR_LOG_INTERVAL_MS) {
         last_sensor_log_ms = now;
 
         if (s_lis302dl.initialized) {

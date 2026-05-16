@@ -35,6 +35,14 @@ static volatile uint8_t uart3_feedback_mask = FEEDBACK_ENCODER;
 static volatile uint8_t uart3_feedback_pending_mask = 0U;
 static volatile uint8_t uart3_feedback_rr_state = FEEDBACK_ENCODER;
 
+// IMU raw cache updated by uart3_update_imu_raw() at 50 Hz
+static volatile int16_t uart3_imu_ax = 0;
+static volatile int16_t uart3_imu_ay = 0;
+static volatile int16_t uart3_imu_az = 0;
+static volatile int16_t uart3_imu_gx = 0;
+static volatile int16_t uart3_imu_gy = 0;
+static volatile int16_t uart3_imu_gz = 0;
+
 static int16_t uart3_round_rpm_to_i16(float rpm)
 {
     if (rpm > 32767.0f) {
@@ -302,14 +310,25 @@ static uint8_t uart3_tx_dma_start(const uint8_t *data, uint16_t len)
     return 1U;
 }
 
-static uint8_t uart3_send_encoder_feedback(void)
+static uint8_t uart3_send_odometry_feedback(void)
 {
-    struct WheelEncType enc_data;
-    enc_data.type = WHEEL_ENC_COMMAND;
-    enc_data.left_enc = getEncoderCount(MOTOR_L);
-    enc_data.right_enc = getEncoderCount(MOTOR_R);
+    struct OdometryType odom;
+    odom.type         = ODOMETRY_COMMAND;
+    odom.timestamp_us = (uint32_t)get_us_tick_count();
+    odom.left_enc     = getEncoderCount(MOTOR_L);
+    odom.right_enc    = getEncoderCount(MOTOR_R);
 
-    uint8_t frame_len = encoderAllPackage((const uint8_t *)&enc_data, sizeof(enc_data), uart3_tx_dma_buffer);
+    uint32_t primask = __get_PRIMASK();
+    __disable_irq();
+    odom.ax = uart3_imu_ax;
+    odom.ay = uart3_imu_ay;
+    odom.az = uart3_imu_az;
+    odom.gx = uart3_imu_gx;
+    odom.gy = uart3_imu_gy;
+    odom.gz = uart3_imu_gz;
+    if (primask == 0U) { __enable_irq(); }
+
+    uint8_t frame_len = encoderAllPackage((const uint8_t *)&odom, sizeof(odom), uart3_tx_dma_buffer);
     return uart3_tx_dma_start(uart3_tx_dma_buffer, frame_len);
 }
 
@@ -322,6 +341,20 @@ static uint8_t uart3_send_motor_rpm_feedback(void)
 
     uint8_t frame_len = encoderAllPackage((const uint8_t *)&rpm_data, sizeof(rpm_data), uart3_tx_dma_buffer);
     return uart3_tx_dma_start(uart3_tx_dma_buffer, frame_len);
+}
+
+void uart3_update_imu_raw(int16_t ax, int16_t ay, int16_t az,
+                           int16_t gx, int16_t gy, int16_t gz)
+{
+    uint32_t primask = __get_PRIMASK();
+    __disable_irq();
+    uart3_imu_ax = ax;
+    uart3_imu_ay = ay;
+    uart3_imu_az = az;
+    uart3_imu_gx = gx;
+    uart3_imu_gy = gy;
+    uart3_imu_gz = gz;
+    if (primask == 0U) { __enable_irq(); }
 }
 
 void uart3_comm_init(void)
@@ -433,7 +466,7 @@ void uart3_comm_poll(void)
     }
 
     if (feedback_to_send == FEEDBACK_ENCODER) {
-        if (uart3_send_encoder_feedback() == 0U) {
+        if (uart3_send_odometry_feedback() == 0U) {
             primask = __get_PRIMASK();
             __disable_irq();
             uart3_feedback_pending_mask |= FEEDBACK_ENCODER;

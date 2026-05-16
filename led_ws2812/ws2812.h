@@ -2,6 +2,7 @@
 #define __WS2812_H
 
 #include "stdint.h"
+#include "velocity_control.h"  // shared LED_TYPE_* enum values
 
 #ifdef __cplusplus
 extern "C" {
@@ -27,17 +28,7 @@ typedef struct
     uint8_t b;
 } ws2812_color_t;
 
-// LED display type
-typedef enum
-{
-    LED_TYPE_OFF = 0,
-    LED_TYPE_SOLID,
-    LED_TYPE_BLINK,
-    LED_TYPE_RAINBOW,
-    LED_TYPE_BREATH,
-    LED_TYPE_CHASE,
-    LED_TYPE_SCANNER
-} led_display_type_t;
+// led_display_type_t typedef defined in velocity_control.h
 
 // Params type for solid color
 typedef struct

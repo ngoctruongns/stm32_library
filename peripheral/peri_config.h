@@ -18,3 +18,6 @@
 
 // Sensor data logging interval
 #define SENSOR_LOG_INTERVAL_MS   100U
+
+// IMU odometry read interval (50 Hz) — must match UART3_FEEDBACK_PERIOD_MS
+#define IMU_ODOM_INTERVAL_MS     20U
